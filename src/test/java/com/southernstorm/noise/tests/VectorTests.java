@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.ShortBufferException;
@@ -193,8 +194,14 @@ public class VectorTests {
 			}
 			assertEquals(HandshakeState.WRITE_MESSAGE, send.getAction());
 			assertEquals(HandshakeState.READ_MESSAGE, recv.getAction());
+
+
 			TestMessage msg = vec.messages[index];
 			int len = send.writeMessage(message, 0, msg.payload, 0, msg.payload.length);
+
+       //System.out.printf("src msg: %s\n", HexFormat.of().formatHex(msg.payload, 0, msg.payload.length)); 
+       //System.out.printf("encrypt ciphertext: %s\n", HexFormat.of().formatHex(message, 0, len)); 
+
 			assertEquals(msg.ciphertext.length, len);
 			assertSubArrayEquals(Integer.toString(index) + ": ciphertext", msg.ciphertext, message);
 			if (fallback) {
@@ -223,6 +230,9 @@ public class VectorTests {
 				fallback = false;
 			} else {
 				int plen = recv.readMessage(message, 0, len, plaintext, 0);
+
+                //System.out.printf("decrypt plaintext: %s\n", HexFormat.of().formatHex(plaintext, 0, plen)); 
+
 				assertEquals(msg.payload.length, plen);
 				assertSubArrayEquals(Integer.toString(index) + ": payload", msg.payload, plaintext);
 			}
@@ -238,9 +248,11 @@ public class VectorTests {
 
 		// Handshake finished.  Check the handshake hash values.
 		if (vec.handshake_hash != null) {
+            //System.out.printf("handshake hash: %s\n", HexFormat.of().formatHex(initiator.getHandshakeHash(), 0, initiator.getHandshakeHash().length)); 
 			assertArrayEquals(vec.handshake_hash, initiator.getHandshakeHash());
 			assertArrayEquals(vec.handshake_hash, responder.getHandshakeHash());
 		}
+
 
 		// Split the two sides to get the transport ciphers.
 		CipherStatePair initPair;
@@ -274,12 +286,20 @@ public class VectorTests {
 				crecv = initPair.getReceiver();
 				role = HandshakeState.INITIATOR;
 			}
+
 			int len = csend.encryptWithAd(null, msg.payload, 0, message, 0, msg.payload.length);
+            //System.out.printf("src msg: %s\n", HexFormat.of().formatHex(msg.payload, 0, msg.payload.length)); 
+            //System.out.printf("encrypt ciphertext: %s\n", HexFormat.of().formatHex(message, 0, len)); 
 			assertEquals(msg.ciphertext.length, len);
 			assertSubArrayEquals(Integer.toString(index) + ": ciphertext", msg.ciphertext, message);
+
+
 			int plen = crecv.decryptWithAd(null, message, 0, plaintext, 0, len);
 			assertEquals(msg.payload.length, plen);
 			assertSubArrayEquals(Integer.toString(index) + ": payload", msg.payload, plaintext);
+
+            //System.out.printf("decrypt plaintext: %s\n", HexFormat.of().formatHex(plaintext, 0, plen)); 
+
 		}
 
 		// Clean up.

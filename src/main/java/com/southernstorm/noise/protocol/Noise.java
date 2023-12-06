@@ -86,6 +86,8 @@ public final class Noise {
 	 */
 	public static DHState createDH(String name) throws NoSuchAlgorithmException
 	{
+		if (name.equals("P256"))
+			return new CurveP256DHState();
 		if (name.equals("25519"))
 			return new Curve25519DHState();
 		if (name.equals("448"))
