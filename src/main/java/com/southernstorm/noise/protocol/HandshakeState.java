@@ -36,16 +36,18 @@ public class HandshakeState implements Destroyable {
 	private SymmetricState symmetric;
 	private boolean isInitiator;
 	private DHState localKeyPair;
+	private DHState localKeyPairM;
 	private DHState localEphemeral;
 	private DHState localHybrid;
 	private DHState remotePublicKey;
+	private DHState remotePublicKeyM;
 	private DHState remoteEphemeral;
 	private DHState remoteHybrid;
 	private DHState fixedEphemeral;
 	private DHState fixedHybrid;
 	private int action;
 	private int requirements;
-	private short[] pattern;
+	private int[] pattern;
 	private int patternIndex;
 	private byte[] preSharedKey;
 	private byte[] prologue;
@@ -101,11 +103,13 @@ public class HandshakeState implements Destroyable {
 	 * Local static keypair is required for the handshake.
 	 */
 	private static final int LOCAL_REQUIRED = 0x01;
+	private static final int LOCALM_REQUIRED = 0x10000;
 	
 	/**
 	 * Remote static keypai is required for the handshake.
 	 */
 	private static final int REMOTE_REQUIRED = 0x02;
+	private static final int REMOTEM_REQUIRED = 0x20000;
 	
 	/**
 	 * Pre-shared key is required for the handshake.
@@ -121,11 +125,13 @@ public class HandshakeState implements Destroyable {
 	 * The local public key is part of the pre-message.
 	 */
 	private static final int LOCAL_PREMSG = 0x10;
+	private static final int LOCALM_PREMSG = 0x40000;
 
 	/**
 	 * The remote public key is part of the pre-message.
 	 */
 	private static final int REMOTE_PREMSG = 0x20;
+	private static final int REMOTEM_PREMSG = 0x80000;
 
 	/**
 	 * Fallback is possible from this pattern (two-way, ends in "K").
@@ -161,7 +167,7 @@ public class HandshakeState implements Destroyable {
 		pattern = Pattern.lookup(patternId);
 		if (pattern == null)
 			throw new IllegalArgumentException("Handshake pattern is not recognized");
-		short flags = pattern[0];
+		int flags = pattern[0];
 		int extraReqs = 0;
 		if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0 && patternId.length() > 1)
 			extraReqs |= FALLBACK_POSSIBLE;
@@ -195,12 +201,16 @@ public class HandshakeState implements Destroyable {
 		// Create the DH objects that we will need later.
 		if ((flags & Pattern.FLAG_LOCAL_STATIC) != 0)
 			localKeyPair = Noise.createDH(dh);
+		if ((flags & Pattern.FLAG_LOCALM_STATIC) != 0)
+			localKeyPairM = Noise.createDH(dh);
 		if ((flags & Pattern.FLAG_LOCAL_EPHEMERAL) != 0)
 			localEphemeral = Noise.createDH(dh);
 		if ((flags & Pattern.FLAG_LOCAL_HYBRID) != 0)
 			localHybrid = Noise.createDH(hybrid);
 		if ((flags & Pattern.FLAG_REMOTE_STATIC) != 0)
 			remotePublicKey = Noise.createDH(dh);
+		if ((flags & Pattern.FLAG_REMOTEM_STATIC) != 0)
+			remotePublicKeyM = Noise.createDH(dh);
 		if ((flags & Pattern.FLAG_REMOTE_EPHEMERAL) != 0)
 			remoteEphemeral = Noise.createDH(dh);
 		if ((flags & Pattern.FLAG_REMOTE_HYBRID) != 0)
@@ -210,10 +220,14 @@ public class HandshakeState implements Destroyable {
 		// as the unbalanced nature of the algorithm only works with "f" and "ff" tokens.
 		if (localKeyPair instanceof DHStateHybrid)
 			throw new NoSuchAlgorithmException("Cannot use '" + localKeyPair.getDHName() + "' for static keys");
+		if (localKeyPairM instanceof DHStateHybrid)
+			throw new NoSuchAlgorithmException("Cannot use '" + localKeyPairM.getDHName() + "' for static keys");
 		if (localEphemeral instanceof DHStateHybrid)
 			throw new NoSuchAlgorithmException("Cannot use '" + localEphemeral.getDHName() + "' for ephemeral keys");
 		if (remotePublicKey instanceof DHStateHybrid)
 			throw new NoSuchAlgorithmException("Cannot use '" + remotePublicKey.getDHName() + "' for static keys");
+		if (remotePublicKeyM instanceof DHStateHybrid)
+			throw new NoSuchAlgorithmException("Cannot use '" + remotePublicKeyM.getDHName() + "' for static keys");
 		if (remoteEphemeral instanceof DHStateHybrid)
 			throw new NoSuchAlgorithmException("Cannot use '" + remoteEphemeral.getDHName() + "' for ephemeral keys");
 	}
@@ -333,6 +347,11 @@ public class HandshakeState implements Destroyable {
 		return localKeyPair;
 	}
 
+	public DHState getLocalKeyPairM()
+	{
+		return localKeyPairM;
+	}
+
 	/**
 	 * Determine if this handshake requires a local static key.
 	 * 
@@ -345,6 +364,14 @@ public class HandshakeState implements Destroyable {
 	{
 		if (localKeyPair != null)
 			return !localKeyPair.hasPrivateKey();
+		else
+			return false;
+	}
+
+	public boolean needsLocalKeyPairM()
+	{
+		if (localKeyPairM != null)
+			return !localKeyPairM.hasPrivateKey();
 		else
 			return false;
 	}
@@ -363,6 +390,14 @@ public class HandshakeState implements Destroyable {
 		else
 			return false;
 	}
+
+	public boolean hasLocalKeyPairM()
+	{
+		if (localKeyPairM != null)
+			return localKeyPairM.hasPrivateKey();
+		else
+			return false;
+	}
 	
 	/**
 	 * Gets the public key object for the remote static key.
@@ -373,6 +408,11 @@ public class HandshakeState implements Destroyable {
 	public DHState getRemotePublicKey()
 	{
 		return remotePublicKey;
+	}
+
+	public DHState getRemotePublicKeyM()
+	{
+		return remotePublicKeyM;
 	}
 	
 	/**
@@ -390,6 +430,14 @@ public class HandshakeState implements Destroyable {
 		else
 			return false;
 	}
+
+	public boolean needsRemotePublicKeyM()
+	{
+		if (remotePublicKeyM != null)
+			return !remotePublicKeyM.hasPublicKey();
+		else
+			return false;
+	}
 	
 	/**
 	 * Determine if this handshake has already been configured
@@ -402,6 +450,14 @@ public class HandshakeState implements Destroyable {
 	{
 		if (remotePublicKey != null)
 			return remotePublicKey.hasPublicKey();
+		else
+			return false;
+	}
+
+	public boolean hasRemotePublicKeyM()
+	{
+		if (remotePublicKeyM != null)
+			return remotePublicKeyM.hasPublicKey();
 		else
 			return false;
 	}
@@ -500,10 +556,20 @@ public class HandshakeState implements Destroyable {
 			if (localKeyPair == null || !localKeyPair.hasPrivateKey())
 				throw new IllegalStateException("Local static key required");
 		}
+		if ((requirements & LOCALM_REQUIRED) != 0) {
+			if (localKeyPairM == null || !localKeyPairM.hasPrivateKey())
+				throw new IllegalStateException("Local staticM key required");
+		}
+
 		if ((requirements & REMOTE_REQUIRED) != 0) {
 			if (remotePublicKey == null || !remotePublicKey.hasPublicKey())
 				throw new IllegalStateException("Remote static key required");
 		}
+		if ((requirements & REMOTEM_REQUIRED) != 0) {
+			if (remotePublicKeyM == null || !remotePublicKeyM.hasPublicKey())
+				throw new IllegalStateException("Remote staticM key required");
+		}
+
 		if ((requirements & PSK_REQUIRED) != 0) {
 			if (preSharedKey == null)
 				throw new IllegalStateException("Pre-shared key required");
@@ -523,6 +589,8 @@ public class HandshakeState implements Destroyable {
 		if (isInitiator) {
 			if ((requirements & LOCAL_PREMSG) != 0)
 				symmetric.mixPublicKey(localKeyPair);
+			if ((requirements & LOCALM_PREMSG) != 0)
+				symmetric.mixPublicKey(localKeyPairM);
 			if ((requirements & FALLBACK_PREMSG) != 0) {
 				symmetric.mixPublicKey(remoteEphemeral);
 				if (remoteHybrid != null)
@@ -532,9 +600,13 @@ public class HandshakeState implements Destroyable {
 			}
 			if ((requirements & REMOTE_PREMSG) != 0)
 				symmetric.mixPublicKey(remotePublicKey);
+			if ((requirements & REMOTEM_PREMSG) != 0)
+				symmetric.mixPublicKey(remotePublicKeyM);
 		} else {
 			if ((requirements & REMOTE_PREMSG) != 0)
 				symmetric.mixPublicKey(remotePublicKey);
+			if ((requirements & REMOTEM_PREMSG) != 0)
+				symmetric.mixPublicKey(remotePublicKeyM);
 			if ((requirements & FALLBACK_PREMSG) != 0) {
 				symmetric.mixPublicKey(localEphemeral);
 				if (localHybrid != null)
@@ -544,6 +616,8 @@ public class HandshakeState implements Destroyable {
 			}
 			if ((requirements & LOCAL_PREMSG) != 0)
 				symmetric.mixPublicKey(localKeyPair);
+			if ((requirements & LOCALM_PREMSG) != 0)
+				symmetric.mixPublicKey(localKeyPairM);
 		}
 		
 		// The handshake has officially started - set the first action.
@@ -637,7 +711,7 @@ public class HandshakeState implements Destroyable {
 			throw new UnsupportedOperationException("Previous handshake pattern does not support fallback");
 
 		// Check that "patternName" supports fallback.
-		short[] newPattern = Pattern.lookup(patternName);
+		int[] newPattern = Pattern.lookup(patternName);
 		if (newPattern == null || (newPattern[0] & Pattern.FLAG_REMOTE_EPHEM_REQ) == 0)
 			throw new UnsupportedOperationException("New pattern is not a fallback pattern");
 
@@ -677,6 +751,8 @@ public class HandshakeState implements Destroyable {
 				remoteHybrid.clearKey();
 			if (remotePublicKey != null)
 				remotePublicKey.clearKey();
+			if (remotePublicKeyM != null)
+				remotePublicKeyM.clearKey();
 			isInitiator = false;
 		} else {
 			if (localEphemeral != null)
@@ -685,12 +761,14 @@ public class HandshakeState implements Destroyable {
 				localHybrid.clearKey();
 			if ((newPattern[0] & Pattern.FLAG_REMOTE_REQUIRED) == 0 && remotePublicKey != null)
 				remotePublicKey.clearKey();
+			if ((newPattern[0] & Pattern.FLAG_REMOTEM_REQUIRED) == 0 && remotePublicKeyM != null)
+				remotePublicKeyM.clearKey();
 			isInitiator = true;
 		}
 		action = NO_ACTION;
 		pattern = newPattern;
 		patternIndex = 1;
-		short flags = pattern[0];
+		int flags = pattern[0];
 		if (!isInitiator) {
 			// Reverse the pattern flags so that the responder is "local".
 			flags = Pattern.reverseFlags(flags);
@@ -783,7 +861,7 @@ public class HandshakeState implements Destroyable {
 					action = SPLIT;
 					break;
 				}
-				short token = pattern[patternIndex++];
+				int token = pattern[patternIndex++];
 				if (token == Pattern.FLIP_DIR) {
 					// Change directions, so this message is complete and the
 					// next action is "read message".
@@ -832,6 +910,20 @@ public class HandshakeState implements Destroyable {
 					}
 					break;
 
+					case Pattern.M:
+					{
+			            // Encrypt the local static public key and add it to the message.
+						if (localKeyPairM == null)
+							throw new IllegalStateException("Pattern definition error");
+						len = localKeyPairM.getPublicKeyLength();
+						macLen = symmetric.getMACLength();
+						if (space < (len + macLen))
+							throw new ShortBufferException();
+						localKeyPairM.getPublicKey(message, messagePosn);
+						messagePosn += symmetric.encryptAndHash(message, messagePosn, message, messagePosn, len);
+					}
+					break;
+
 					case Pattern.EE:
 					{
 						// DH operation with initiator and responder ephemeral keys.
@@ -849,6 +941,16 @@ public class HandshakeState implements Destroyable {
 					}
 					break;
 
+					case Pattern.EM:
+					{
+						// DH operation with initiator ephemeral and responder static keys.
+						if (isInitiator)
+							mixDH(localEphemeral, remotePublicKeyM);
+						else
+							mixDH(localKeyPairM, remoteEphemeral);
+					}
+					break;
+
 					case Pattern.SE:
 					{
 						// DH operation with initiator static and responder ephemeral keys.
@@ -859,10 +961,27 @@ public class HandshakeState implements Destroyable {
 					}
 					break;
 
+					case Pattern.ME:
+					{
+						// DH operation with initiator static and responder ephemeral keys.
+						if (isInitiator)
+							mixDH(localKeyPairM, remoteEphemeral);
+						else
+							mixDH(localEphemeral, remotePublicKeyM);
+					}
+					break;
+
 					case Pattern.SS:
 					{
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
+					}
+					break;
+
+					case Pattern.MM:
+					{
+						// DH operation with initiator and responder static keys.
+						mixDH(localKeyPairM, remotePublicKeyM);
 					}
 					break;
 					
@@ -981,7 +1100,7 @@ public class HandshakeState implements Destroyable {
 					action = SPLIT;
 					break;
 				}
-				short token = pattern[patternIndex++];
+				int token = pattern[patternIndex++];
 				if (token == Pattern.FLIP_DIR) {
 					// Change directions, so this message is complete and the
 					// next action is "write message".
@@ -1037,6 +1156,27 @@ public class HandshakeState implements Destroyable {
 						messageOffset += len + macLen;
 					}
 					break;
+
+					case Pattern.M:
+					{
+						// Decrypt and read the remote static key.
+						if (remotePublicKeyM == null)
+							throw new IllegalStateException("Pattern definition error");
+						len = remotePublicKeyM.getPublicKeyLength();
+						macLen = symmetric.getMACLength();
+						if (space < (len + macLen))
+							throw new ShortBufferException();
+						byte[] temp = new byte [len];
+						try {
+							if (symmetric.decryptAndHash(message, messageOffset, temp, 0, len + macLen) != len)
+								throw new ShortBufferException();
+							remotePublicKeyM.setPublicKey(temp, 0);
+						} finally {
+							Noise.destroy(temp);
+						}
+						messageOffset += len + macLen;
+					}
+					break;
 	
 					case Pattern.EE:
 					{
@@ -1054,6 +1194,16 @@ public class HandshakeState implements Destroyable {
 							mixDH(localKeyPair, remoteEphemeral);
 					}
 					break;
+
+					case Pattern.EM:
+					{
+						// DH operation with initiator ephemeral and responder static keys.
+						if (isInitiator)
+							mixDH(localEphemeral, remotePublicKeyM);
+						else
+							mixDH(localKeyPairM, remoteEphemeral);
+					}
+					break;
 	
 					case Pattern.SE:
 					{
@@ -1064,11 +1214,28 @@ public class HandshakeState implements Destroyable {
 							mixDH(localEphemeral, remotePublicKey);
 					}
 					break;
+
+					case Pattern.ME:
+					{
+						// DH operation with initiator static and responder ephemeral keys.
+						if (isInitiator)
+							mixDH(localKeyPairM, remoteEphemeral);
+						else
+							mixDH(localEphemeral, remotePublicKeyM);
+					}
+					break;
 	
 					case Pattern.SS:
 					{
 						// DH operation with initiator and responder static keys.
 						mixDH(localKeyPair, remotePublicKey);
+					}
+					break;
+
+					case Pattern.MM:
+					{
+						// DH operation with initiator and responder static keys.
+						mixDH(localKeyPairM, remotePublicKeyM);
 					}
 					break;
 					
@@ -1201,12 +1368,16 @@ public class HandshakeState implements Destroyable {
 			symmetric.destroy();
 		if (localKeyPair != null)
 			localKeyPair.destroy();
+		if (localKeyPairM != null)
+			localKeyPairM.destroy();
 		if (localEphemeral != null)
 			localEphemeral.destroy();
 		if (localHybrid != null)
 			localHybrid.destroy();
 		if (remotePublicKey != null)
 			remotePublicKey.destroy();
+		if (remotePublicKeyM != null)
+			remotePublicKeyM.destroy();
 		if (remoteEphemeral != null)
 			remoteEphemeral.destroy();
 		if (remoteHybrid != null)
@@ -1233,19 +1404,30 @@ public class HandshakeState implements Destroyable {
 	 * 
 	 * @return The set of requirements for the handshake.
 	 */
-	private static int computeRequirements(short flags, String prefix, int role, boolean isFallback)
+	private static int computeRequirements(int flags, String prefix, int role, boolean isFallback)
 	{
 		int requirements = 0;
 	    if ((flags & Pattern.FLAG_LOCAL_STATIC) != 0) {
 	        requirements |= LOCAL_REQUIRED;
 	    }
+	    if ((flags & Pattern.FLAG_LOCALM_STATIC) != 0) {
+	        requirements |= LOCALM_REQUIRED;
+	    }
 	    if ((flags & Pattern.FLAG_LOCAL_REQUIRED) != 0) {
 	        requirements |= LOCAL_REQUIRED;
 	        requirements |= LOCAL_PREMSG;
 	    }
+	    if ((flags & Pattern.FLAG_LOCALM_REQUIRED) != 0) {
+	        requirements |= LOCALM_REQUIRED;
+	        requirements |= LOCALM_PREMSG;
+	    }
 	    if ((flags & Pattern.FLAG_REMOTE_REQUIRED) != 0) {
 	        requirements |= REMOTE_REQUIRED;
 	        requirements |= REMOTE_PREMSG;
+	    }
+	    if ((flags & Pattern.FLAG_REMOTEM_REQUIRED) != 0) {
+	        requirements |= REMOTEM_REQUIRED;
+	        requirements |= REMOTEM_PREMSG;
 	    }
 	    if ((flags & (Pattern.FLAG_REMOTE_EPHEM_REQ |
 	    		      Pattern.FLAG_LOCAL_EPHEM_REQ)) != 0) {

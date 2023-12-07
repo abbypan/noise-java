@@ -84,14 +84,18 @@ public class VectorTests {
 		public byte[] init_ephemeral;
 		public byte[] init_hybrid;
 		public byte[] init_static;
+		public byte[] init_staticm;
 		public byte[] init_remote_static;
+		public byte[] init_remote_staticm;
 		public byte[] init_psk;
 		public byte[] init_ssk;
 		public byte[] resp_prologue;
 		public byte[] resp_ephemeral;
 		public byte[] resp_hybrid;
 		public byte[] resp_static;
+		public byte[] resp_staticm;
 		public byte[] resp_remote_static;
+		public byte[] resp_remote_staticm;
 		public byte[] resp_psk;
 		public byte[] resp_ssk;
 		public byte[] handshake_hash;
@@ -134,8 +138,12 @@ public class VectorTests {
 			initiator.setPrologue(vec.init_prologue, 0, vec.init_prologue.length);
 		if (vec.init_static != null)
 			initiator.getLocalKeyPair().setPrivateKey(vec.init_static, 0);
+		if (vec.init_staticm != null)
+			initiator.getLocalKeyPairM().setPrivateKey(vec.init_staticm, 0);
 		if (vec.init_remote_static != null)
 			initiator.getRemotePublicKey().setPublicKey(vec.init_remote_static, 0);
+		if (vec.init_remote_staticm != null)
+			initiator.getRemotePublicKeyM().setPublicKey(vec.init_remote_staticm, 0);
 		if (vec.init_hybrid != null)
 			initiator.getFixedHybridKey().setPrivateKey(vec.init_hybrid, 0);
 		if (vec.init_ephemeral != null)
@@ -146,8 +154,12 @@ public class VectorTests {
 			responder.setPrologue(vec.resp_prologue, 0, vec.resp_prologue.length);
 		if (vec.resp_static != null)
 			responder.getLocalKeyPair().setPrivateKey(vec.resp_static, 0);
+		if (vec.resp_staticm != null)
+			responder.getLocalKeyPairM().setPrivateKey(vec.resp_staticm, 0);
 		if (vec.resp_remote_static != null)
 			responder.getRemotePublicKey().setPublicKey(vec.resp_remote_static, 0);
+		if (vec.resp_remote_staticm != null)
+			responder.getRemotePublicKeyM().setPublicKey(vec.resp_remote_staticm, 0);
 		if (vec.resp_ephemeral != null) {
 			// Note: The test data contains responder ephemeral keys for one-way
 		    // patterns which doesn't actually make sense.  Ignore those keys.
@@ -345,8 +357,12 @@ public class VectorTests {
 				vec.init_hybrid = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("init_static"))
 				vec.init_static = DatatypeConverter.parseHexBinary(reader.nextString());
+			else if (name.equals("init_staticm"))
+				vec.init_staticm = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("init_remote_static"))
 				vec.init_remote_static = DatatypeConverter.parseHexBinary(reader.nextString());
+			else if (name.equals("init_remote_staticm"))
+				vec.init_remote_staticm = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("init_psk"))
 				vec.init_psk = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("init_ssk"))
@@ -359,8 +375,12 @@ public class VectorTests {
 				vec.resp_hybrid = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("resp_static"))
 				vec.resp_static = DatatypeConverter.parseHexBinary(reader.nextString());
+			else if (name.equals("resp_staticm"))
+				vec.resp_staticm = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("resp_remote_static"))
 				vec.resp_remote_static = DatatypeConverter.parseHexBinary(reader.nextString());
+			else if (name.equals("resp_remote_staticm"))
+				vec.resp_remote_staticm = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("resp_psk"))
 				vec.resp_psk = DatatypeConverter.parseHexBinary(reader.nextString());
 			else if (name.equals("resp_ssk"))

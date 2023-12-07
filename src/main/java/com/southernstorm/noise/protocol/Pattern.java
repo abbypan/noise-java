@@ -30,31 +30,41 @@ class Pattern {
 	private Pattern() {}
 
 	// Token codes.
-	public static final short S = 1;
-	public static final short E = 2;
-	public static final short EE = 3;
-	public static final short ES = 4;
-	public static final short SE = 5;
-	public static final short SS = 6;
-	public static final short F = 7;
-	public static final short FF = 8;
-	public static final short FLIP_DIR = 255;
+	public static final int S = 1;
+	public static final int E = 2;
+	public static final int EE = 3;
+	public static final int ES = 4;
+	public static final int SE = 5;
+	public static final int SS = 6;
+	public static final int F = 7;
+	public static final int FF = 8;
+	public static final int M = 9;
+	public static final int EM = 10;
+	public static final int ME = 11;
+	public static final int MM = 12;
+	public static final int FLIP_DIR = 255;
 	
 	// Pattern flag bits.
-	public static final short FLAG_LOCAL_STATIC = 0x0001;
-	public static final short FLAG_LOCAL_EPHEMERAL = 0x0002;
-	public static final short FLAG_LOCAL_REQUIRED = 0x0004;
-	public static final short FLAG_LOCAL_EPHEM_REQ = 0x0008;
-	public static final short FLAG_LOCAL_HYBRID = 0x0010;
-	public static final short FLAG_LOCAL_HYBRID_REQ = 0x0020;
-	public static final short FLAG_REMOTE_STATIC = 0x0100;
-	public static final short FLAG_REMOTE_EPHEMERAL = 0x0200;
-	public static final short FLAG_REMOTE_REQUIRED = 0x0400;
-	public static final short FLAG_REMOTE_EPHEM_REQ = 0x0800;
-	public static final short FLAG_REMOTE_HYBRID = 0x1000;
-	public static final short FLAG_REMOTE_HYBRID_REQ = 0x2000;
+	public static final int FLAG_LOCAL_STATIC = 0x0001;
+	public static final int FLAG_LOCAL_EPHEMERAL = 0x0002;
+	public static final int FLAG_LOCAL_REQUIRED = 0x0004;
+	public static final int FLAG_LOCAL_EPHEM_REQ = 0x0008;
+	public static final int FLAG_LOCAL_HYBRID = 0x0010;
+	public static final int FLAG_LOCAL_HYBRID_REQ = 0x0020;
 
-	private static final short[] noise_pattern_N = {
+	public static final int FLAG_REMOTE_STATIC = 0x0100;
+	public static final int FLAG_REMOTE_EPHEMERAL = 0x0200;
+	public static final int FLAG_REMOTE_REQUIRED = 0x0400;
+	public static final int FLAG_REMOTE_EPHEM_REQ = 0x0800;
+	public static final int FLAG_REMOTE_HYBRID = 0x1000;
+	public static final int FLAG_REMOTE_HYBRID_REQ = 0x2000;
+
+	public static final int FLAG_LOCALM_STATIC = 0x0040;
+	public static final int FLAG_LOCALM_REQUIRED = 0x0080;
+	public static final int FLAG_REMOTEM_STATIC = 0x4000;
+	public static final int FLAG_REMOTEM_REQUIRED = 0x8000;
+
+	private static final int[] noise_pattern_N = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
 	    FLAG_REMOTE_REQUIRED,
@@ -63,7 +73,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_K = {
+	private static final int[] noise_pattern_K = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -75,7 +85,7 @@ class Pattern {
 	    SS
 	};
 
-	private static final short[] noise_pattern_X = {
+	private static final int[] noise_pattern_X = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -87,7 +97,7 @@ class Pattern {
 	    SS
 	};
 
-	private static final short[] noise_pattern_NN = {
+	private static final int[] noise_pattern_NN = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_EPHEMERAL,
 
@@ -97,7 +107,7 @@ class Pattern {
 	    EE
 	};
 
-	private static final short[] noise_pattern_NK = {
+	private static final int[] noise_pattern_NK = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
 	    FLAG_REMOTE_EPHEMERAL |
@@ -110,7 +120,7 @@ class Pattern {
 	    EE
 	};
 
-	private static final short[] noise_pattern_NX = {
+	private static final int[] noise_pattern_NX = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
 	    FLAG_REMOTE_EPHEMERAL,
@@ -123,7 +133,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XN = {
+	private static final int[] noise_pattern_XN = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_EPHEMERAL,
@@ -137,7 +147,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_XK = {
+	private static final int[] noise_pattern_XK = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -154,7 +164,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_XX = {
+	private static final int[] noise_pattern_XX = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -171,7 +181,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KN = {
+	private static final int[] noise_pattern_KN = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -184,7 +194,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KK = {
+	private static final int[] noise_pattern_KK = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -201,7 +211,31 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KX = {
+	private static final int[] noise_pattern_KKKK = {
+	    FLAG_LOCAL_STATIC |
+	    FLAG_LOCALM_STATIC |
+	    FLAG_LOCAL_EPHEMERAL |
+	    FLAG_LOCAL_REQUIRED |
+	    FLAG_LOCALM_REQUIRED |
+	    FLAG_REMOTE_STATIC |
+	    FLAG_REMOTEM_STATIC |
+	    FLAG_REMOTE_EPHEMERAL |
+	    FLAG_REMOTE_REQUIRED |
+	    FLAG_REMOTEM_REQUIRED,
+
+	    E,
+	    ES,
+	    SS,
+        EM,
+        MM, 
+	    FLIP_DIR,
+	    E,
+	    EE,
+	    SE, 
+        ME, 
+	};
+
+	private static final int[] noise_pattern_KX = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -217,7 +251,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_IN = {
+	private static final int[] noise_pattern_IN = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_EPHEMERAL,
@@ -230,7 +264,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IK = {
+	private static final int[] noise_pattern_IK = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -247,7 +281,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IX = {
+	private static final int[] noise_pattern_IX = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -263,7 +297,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XXfallback = {
+	private static final int[] noise_pattern_XXfallback = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -279,7 +313,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_Xnoidh = {
+	private static final int[] noise_pattern_Xnoidh = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -291,7 +325,7 @@ class Pattern {
 	    SS
 	};
 
-	private static final short[] noise_pattern_NXnoidh = {
+	private static final int[] noise_pattern_NXnoidh = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
 	    FLAG_REMOTE_EPHEMERAL,
@@ -304,7 +338,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XXnoidh = {
+	private static final int[] noise_pattern_XXnoidh = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -321,7 +355,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KXnoidh = {
+	private static final int[] noise_pattern_KXnoidh = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -337,7 +371,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_IKnoidh = {
+	private static final int[] noise_pattern_IKnoidh = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -354,7 +388,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IXnoidh = {
+	private static final int[] noise_pattern_IXnoidh = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_REMOTE_STATIC |
@@ -370,7 +404,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_NNhfs = {
+	private static final int[] noise_pattern_NNhfs = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
 	    FLAG_REMOTE_EPHEMERAL |
@@ -385,7 +419,7 @@ class Pattern {
 	    FF
 	};
 
-	private static final short[] noise_pattern_NKhfs = {
+	private static final int[] noise_pattern_NKhfs = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
 	    FLAG_REMOTE_STATIC |
@@ -403,7 +437,7 @@ class Pattern {
 	    FF
 	};
 
-	private static final short[] noise_pattern_NXhfs = {
+	private static final int[] noise_pattern_NXhfs = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
 	    FLAG_REMOTE_STATIC |
@@ -421,7 +455,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XNhfs = {
+	private static final int[] noise_pattern_XNhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -440,7 +474,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_XKhfs = {
+	private static final int[] noise_pattern_XKhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -462,7 +496,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_XXhfs = {
+	private static final int[] noise_pattern_XXhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -484,7 +518,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KNhfs = {
+	private static final int[] noise_pattern_KNhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -502,7 +536,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KKhfs = {
+	private static final int[] noise_pattern_KKhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -524,7 +558,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KXhfs = {
+	private static final int[] noise_pattern_KXhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -545,7 +579,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_INhfs = {
+	private static final int[] noise_pattern_INhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -563,7 +597,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IKhfs = {
+	private static final int[] noise_pattern_IKhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -585,7 +619,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IXhfs = {
+	private static final int[] noise_pattern_IXhfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -606,7 +640,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XXfallback_hfs = {
+	private static final int[] noise_pattern_XXfallback_hfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -627,7 +661,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_NXnoidh_hfs = {
+	private static final int[] noise_pattern_NXnoidh_hfs = {
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
 	    FLAG_REMOTE_STATIC |
@@ -645,7 +679,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_XXnoidh_hfs = {
+	private static final int[] noise_pattern_XXnoidh_hfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -667,7 +701,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_KXnoidh_hfs = {
+	private static final int[] noise_pattern_KXnoidh_hfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_REQUIRED |
@@ -688,7 +722,7 @@ class Pattern {
 	    ES
 	};
 
-	private static final short[] noise_pattern_IKnoidh_hfs = {
+	private static final int[] noise_pattern_IKnoidh_hfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -710,7 +744,7 @@ class Pattern {
 	    SE
 	};
 
-	private static final short[] noise_pattern_IXnoidh_hfs = {
+	private static final int[] noise_pattern_IXnoidh_hfs = {
 	    FLAG_LOCAL_STATIC |
 	    FLAG_LOCAL_EPHEMERAL |
 	    FLAG_LOCAL_HYBRID |
@@ -737,12 +771,14 @@ class Pattern {
 	 * @param name The name of the pattern.
 	 * @return The pattern description or null.
 	 */
-	public static short[] lookup(String name)
+	public static int[] lookup(String name)
 	{
 		if (name.equals("N"))
 			return noise_pattern_N;
 		else if (name.equals("K"))
 			return noise_pattern_K;
+		else if (name.equals("KK-KK"))
+			return noise_pattern_KKKK;
 		else if (name.equals("X"))
 			return noise_pattern_X;
 		else if (name.equals("NN"))
@@ -828,8 +864,8 @@ class Pattern {
 	 * @param flags The flags, assuming that the initiator is "local".
 	 * @return The reversed flags, with the responder now being "local".
 	 */
-	public static short reverseFlags(short flags)
+	public static int reverseFlags(int flags)
 	{
-		return (short)(((flags >> 8) & 0x00FF) | ((flags << 8) & 0xFF00));
+		return (int)(((flags >> 8) & 0x00FF) | ((flags << 8) & 0xFF00));
 	}
 }

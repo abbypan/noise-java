@@ -43,6 +43,52 @@
 "handshake_hash": "31d3a3ef3df9bb06ed673bbbefa0c4b452733586c4d6435bfffff9400bb322ef"
 }, 
 {
+"name": "Noise_KK-KK_P256_AESGCM_SHA256",
+"pattern": "KK-KK",
+"dh": "P256",
+"cipher": "AESGCM",
+"hash": "SHA256",
+"init_prologue": "50726f6c6f677565313233",
+"init_static": "f09691a3df81425c31d074917ee4dc1f28c8aec5d77fc5e48679b68567465eb4",
+"init_staticm": "3a0b1538fa46c8e58393ed5819db36c74bf5b275bf881a123b1a99d196bb7462",
+"init_ephemeral": "6c01e03d2669c921d172f49e7ddb04625a7391227b99bb08979d7aa4884056aa",
+"init_remote_static": "023135351915c87fb719b0052c188f9e579a2239544b02b91ab43274aee575a76d",
+"init_remote_staticm": "026f515c25e25b3a35f5f1f975108e6bb81d6ad90fc0e2d46ecd3945ac3f31f92b",
+"resp_prologue": "50726f6c6f677565313233",
+"resp_static": "cedce462f2928ff403365b250ddfe9f251fa10dd76674c4997081fc6d4d6acf4",
+"resp_staticm": "39d5ac8c54860a250c6c40952ecd6c9f6e5d6ef3d4ad655fc72938dc1b2de146",
+"resp_ephemeral": "f9ba7bf2e14b0fc78888e36ca34d8e0e4798fefa0f34a0f0c84037665ddd1dfb",
+"resp_remote_static": "02111973f476816ed6ad905c6487c95c0ba88edf9565b5685b50d0dbedcc70d2d7",
+"resp_remote_staticm": "03806befec836b681579d4bdbbe89e7724ea93054d57eb5a3c780c942dd8a6c0ea",
+"messages": [
+{
+"payload": "4c756477696720766f6e204d69736573",
+"ciphertext": "03579e25cf0c6d9782b9a2f61a56094538993af1f79978b533157617d2a2eadf208756aa10ddf42c89eb467604c6f6dfcb8b3d1c6524fb2a29430a84eabc0d63cf"
+},
+{
+"payload": "4d757272617920526f746862617264",
+"ciphertext": "034bf8f658e2039ce631a3f28f78418a004de061a3dd50e8896610c3a2bb4c77cc096ee8dc5ae39905bbb0876bb675fab4c3bbca20038b4bb8cad7e23dc11990"
+},
+{
+"payload": "462e20412e20486179656b",
+"ciphertext": "563900a09010fcafb115cfea4ca195f1861676a6de9be12d9d650b"
+},
+{
+"payload": "4361726c204d656e676572",
+"ciphertext": "d53e3c327ff674501314967512a80dda79923a0b6bf61c0181221d"
+},
+{
+"payload": "4a65616e2d426170746973746520536179",
+"ciphertext": "443461249f7eb1a3cae4310063cd43a821fa9a14ec5c4af26a3ed5f50ae3033d5e"
+},
+{
+"payload": "457567656e2042f6686d20766f6e2042617765726b",
+"ciphertext": "c39dc5396fb2213066bf203c69ec4193371e2401a21989a848d8ab14ce2a98d7a79561a963"
+}
+],
+"handshake_hash": "3ffa52b071f15aad1d1179629127221eefe52886cb8495e1a01edfdcf4c16838"
+},  
+{
 "name": "Noise_N_25519_ChaChaPoly_BLAKE2s",
 "pattern": "N",
 "dh": "25519",
