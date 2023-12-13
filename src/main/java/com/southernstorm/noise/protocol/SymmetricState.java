@@ -309,6 +309,11 @@ class SymmetricState implements Destroyable {
 		return h;
 	}
 
+	public byte[] getHandshakePrevHash()
+	{
+		return prev_h;
+	}
+
 	@Override
 	public void destroy() {
 		if (cipher != null) {

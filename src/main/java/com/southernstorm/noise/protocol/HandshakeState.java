@@ -1188,11 +1188,16 @@ public class HandshakeState implements Destroyable {
 	 */
 	public byte[] getHandshakeHash()
 	{
-		if (action != SPLIT && action != COMPLETE) {
-			throw new IllegalStateException
-				("Handshake has not completed");
-		}
+		//if (action != SPLIT && action != COMPLETE) {
+			//throw new IllegalStateException
+				//("Handshake has not completed");
+		//}
 		return symmetric.getHandshakeHash();
+	}
+
+	public byte[] getHandshakePrevHash()
+	{
+		return symmetric.getHandshakePrevHash();
 	}
 
 	@Override
